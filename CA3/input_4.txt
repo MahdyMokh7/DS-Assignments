@@ -1,0 +1,59 @@
+`timescale 1ns/1ns
+module my_tb();
+	reg clk = 0, rst = 0, serIn = 0;
+	wire w;
+	my_start UUT(clk, rst, serIn, w);
+	initial repeat(40) #100 clk = ~clk;
+	initial begin
+		#40
+		#100 serIn = 1;
+		#200 serIn = 0;
+		#200 serIn = 1;
+		#1000 serIn = 0;
+		#200 serIn = 1;
+		#200 serIn = 1;
+		#200 serIn = 1;
+		#200 serIn = 1;
+		#200 serIn = 1;
+		#200 serIn = 0;
+		#200 serIn = 1;
+		#200 serIn = 0;
+		#200 serIn = 1;
+		#400 $stop;
+	end	
+endmodule
+
+
+
+`timescale 1ns/1ns
+module my_start(input clk, rst, serIn, output w);
+    reg[2:0] ns, ps;
+    parameter A = 3'b000, B = 3'b001, C = 3'b010, D = 3'b011, E = 3'b100, F = 3'b101, G = 3'b110, H = 3'b111;
+    // combinational part detector
+    always@(ps, serIn) begin
+        ns = A;
+        case(ps)
+            A: ns= serIn ? A: B;
+            B: ns= serIn ? C: B;
+            C: ns= serIn ? D: B;
+            D: ns= serIn ? E: B;
+            E: ns= serIn ? F: B;
+            F: ns= serIn ? G: B;
+            G: ns= serIn ? A: H;
+            H: ns= serIn ? C: B;
+            default: ns = A; 
+
+        endcase
+    end
+    assign w = (ps == H) ? 1'b1 : 1'b0;
+
+    // sequantial part detector
+    always @(posedge clk, posedge rst) begin
+        if(rst)
+            ps <= A;
+        else
+            ps <= ns;
+    end
+
+
+endmodule

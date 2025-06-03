@@ -1,0 +1,7 @@
+make min_heap m1
+call m1.heapify(30,40,35)
+call m1.heap_print()
+call m1.heapify(10)
+call m1.heap_print()
+call m1.heapify(7,20,31,60,65,26,2)
+call m1.heap_print()
